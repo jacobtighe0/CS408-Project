@@ -6,8 +6,7 @@ Description: Game is the main Object implementing all the necessary tools for pl
 """
 import ui
 import dealer
-from player import Player
-
+from player import Player, SimpleAI
 
 class Game(object):
     """
@@ -67,6 +66,9 @@ class Game(object):
                 continue
         return self
 
+    def handValues(self):
+        return self.dealer.getHandValues(self.players)
+    
     def printSituation(self, table=False):
         """
         Prints out whole situation in the game.
@@ -78,10 +80,21 @@ class Game(object):
             print("Your cards:")
             ui.cards(self.dealer.playerControl.players[0].hand)
             print()
+
+            for player in self.players:
+                if isinstance(player, SimpleAI):
+                    player.setGame(self)
+
             if table:
                 print("Community cards:")
                 ui.cards(table)
                 print()
+
+                hands = self.handValues()
+                print("You currently have:")
+                ui.printValue(hands[0].handValue)
+                print()
+                
         return self
 
     def allCards(self):
@@ -106,6 +119,11 @@ class Game(object):
         winners = self.dealer.chooseWinner(self.players)
         x = [winner.name for winner in winners]
         ui.roundWinners(x)
+
+        for player in self.players:
+            if isinstance(player, SimpleAI):
+                player.setGame(None)
+
         for w in winners:
             ui.printValue(w.handValue)
         self.dealer.playerControl.givePot(winners)

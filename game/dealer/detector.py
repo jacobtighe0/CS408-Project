@@ -152,8 +152,13 @@ def straight(cards):
     for index,card in enumerate(cards):
         if len(pack) == 4:
             pack.append(card)
-            return pack            
-        control = cardsOrder.index(card[0]) - cardsOrder.index(cards[index+1][0])
+            return pack
+        
+        try:            
+            control = cardsOrder.index(card[0]) - cardsOrder.index(cards[index+1][0])
+        except IndexError:
+            print("Index error (detector.py): " + str(cardsOrder.index(cards[index][0])))
+            
         if control == 1:        
             pack.append(card)
         elif control == 0:

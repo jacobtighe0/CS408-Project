@@ -73,7 +73,9 @@ class Dealer(object):
             return True
         return True
 
-
+    def getHandValues(self, players):
+        handValues = self.cardControl.calculateHandValues(players)
+        return handValues
 
     def chooseWinner(self, players):
         """

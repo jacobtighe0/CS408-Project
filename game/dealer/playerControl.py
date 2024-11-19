@@ -17,6 +17,10 @@ class PlayerControl(object):
     def addPlayer(self,player):
         self.players.append(player)
         return self
+    
+    def removePlayer(self,player):
+        self.players.remove(player)
+        return self
 
     def clearPlayersDebt(self):
         """
@@ -33,6 +37,9 @@ class PlayerControl(object):
         for i in range(1,numPlayers+1):
             if difficulty == "easy":
                self.addPlayer(player.EasyBot())
+               self.players[i].name +=str(i)
+            if difficulty == "normal":
+               self.addPlayer(player.SimpleAI())
                self.players[i].name +=str(i)
         return self.players
 
