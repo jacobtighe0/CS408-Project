@@ -70,7 +70,9 @@ class SimpleAI(player.Player):
                 else:
                     action = 5
             else:
-                if chance < 50:
+                if chance < 10:
+                    action = 4
+                elif chance < 50:
                     if (self.checkBet() == False):
                         action = 2
                     else:

@@ -53,6 +53,8 @@ class Game(object):
                 self.players[index].bet = record[0]
                 if record[1] == -1:
                     players.remove(player)
+                    if len(players) == 1:
+                        break
                 else:
                     self.dealer.playerControl.pot += record[1]
             
@@ -135,10 +137,11 @@ class Game(object):
         :returns: TODO
 
         """
-        print("\n\t\t{}\n".format(phase))
-        self.printSituation(self.dealer.cardControl.tableCards)
-        self.round()
-        self.dealer.cardOnTable(phase)
+        if len(self.players) != 1:
+            print("\n\t\t{}\n".format(phase))
+            self.printSituation(self.dealer.cardControl.tableCards)
+            self.round()
+            self.dealer.cardOnTable(phase)
         
     def isAllIn(self):
         """
