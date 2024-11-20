@@ -97,11 +97,19 @@ class SimpleAI(player.Player):
         import copy
         simGame = copy.deepcopy(self.game)
 
+        player = simGame.dealer.playerControl.players[0] # Non-AI player
+        for c in player.hand:
+            simGame.dealer.cardControl.deck.append(c) # Adds player's cards back to deck
+        player.hand = []
+
+        simGame.players = simGame.dealer.playerControl.players # Makes sure simGame.players is up-to-date
+
         simGame.dealer.cardControl.shuffle()
+        simGame.dealer.cardControl.dealCard([player])
+        simGame.dealer.cardControl.dealCard([player])
+
         while len(simGame.dealer.cardControl.tableCards) < 5:
             simGame.dealer.cardControl.drawTable()
-
-        #print(simGame.dealer.cardControl.tableCards)
 
         winners = simGame.dealer.chooseWinner(simGame.players)
         x = [winner.name for winner in winners]
