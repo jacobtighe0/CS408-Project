@@ -1,6 +1,8 @@
+import math
 from random import randint
 import player.player
 import player.simpleAI
+import copy
 
 class SimpleAI(player.Player):
 
@@ -52,14 +54,13 @@ class SimpleAI(player.Player):
             chance = 0 # AI's chance of winning (initially 0)
             if self.game is not None:
 
-                wins = 0 # Increases by 1 if AI wins a simulated game
-                loops = 10000 # Number of simulations
-
+                loops = 1000 # Number of simulations
+                mcts = MCTS(self)
                 i = 0
                 while i<loops:
-                    wins += self.simulateGame()
+                    mcts.selection()
                     i+=1
-                chance = (wins/loops)*100 # AI's chance of winning
+                chance = (mcts.root.wins/loops)*100 # AI's chance of winning
 
                 print("AI chance of winning:") # --- FOR TESTING ONLY ---
                 print(chance)
@@ -119,4 +120,75 @@ class SimpleAI(player.Player):
             return 1
         else:
             return 0
+
+class Node:
+
+    def __init__(self, state):
+        self.parent = None
+        self.children = []
+        self.visits = 0
+        self.value = 0
+        self.wins = 0
+        self.state = state
+
+class MCTS:
     
+    def __init__(self, AI):
+        self.root = Node(copy.deepcopy(AI.game))
+        self.AIName = AI.name
+        self.game = AI.game
+
+    def selection(self):
+        if self.root.children == []:
+            self.expand(self.root)
+        else:
+            highest_value_node = Node(None)
+            for node in self.root.children:
+                if node.visits == 0:
+                    node.value = float('inf')
+                else:
+                    C = math.sqrt(2)
+                    node.value = node.value / node.visits + C * math.sqrt(math.log(node.parent.visits + 1) / node.visits) 
+                if node.value > highest_value_node.value:
+                    highest_value_node = node
+            self.expand(highest_value_node)
+    
+    def expand(self, node):
+        new_node = Node(copy.deepcopy(node.state))
+        new_node.parent = node
+
+        new_node.state.dealer.cardControl.shuffle()
+
+        if len(new_node.state.dealer.cardControl.tableCards) < 5:
+            if len(new_node.state.dealer.cardControl.tableCards) == 0:
+                new_node.state.dealer.cardControl.drawTable()
+                new_node.state.dealer.cardControl.drawTable()
+                new_node.state.dealer.cardControl.drawTable()
+            else:
+                new_node.state.dealer.cardControl.drawTable()
+        
+        node.children.append(new_node)
+
+        self.simulate(new_node)
+
+    def simulate(self, node):
+        simGame = copy.deepcopy(node.state)
+
+        simGame.dealer.cardControl.shuffle()
+        while len(simGame.dealer.cardControl.tableCards) < 5:
+            simGame.dealer.cardControl.drawTable()
+
+        winners = simGame.dealer.chooseWinner(simGame.players)
+        x = [winner.name for winner in winners]
+        if x[0] == self.AIName:
+            self.backpropagate(node, 1)
+        else:
+            self.backpropagate(node, 0)
+
+    def backpropagate(self, node, result):
+        node.visits += 1
+        node.wins += result
+        if node.parent is not None:
+            self.backpropagate(node.parent, result)
+
+        
