@@ -141,20 +141,24 @@ class MCTS:
         self.game = AI.game
 
     def run(self):
-        self.expand(self.selection(self.root, self.root))
+        selected_node = self.selection(self.root, self.root)
+        self.expand(selected_node)
     
     def selection(self, node, highest_value_node):
-        if node.children == []:
-            if node.visits == 0:
-                node.value = float('inf')
-            else:
-                C = math.sqrt(2)
-                node.value = node.wins / node.visits + C * math.sqrt(math.log(node.parent.visits + 1) / node.visits)
-        else:
+
+        if node.children != []:
             for child in node.children:
                 temp = self.selection(child, highest_value_node)
                 if temp.value > highest_value_node.value:
                     highest_value_node = temp
+
+        if node.visits == 0:
+            node.value = float('inf')
+        else:
+            C = math.sqrt(2)
+            parent_visits = node.parent.visits if node.parent else 1
+            node.value = node.wins / node.visits + C * math.sqrt(math.log(parent_visits) / node.visits)
+
         if node.value > highest_value_node.value:
             highest_value_node = node
         return highest_value_node
