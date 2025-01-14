@@ -58,7 +58,7 @@ class SimpleAI(player.Player):
                 mcts = MCTS(self)
                 i = 0
                 while i<loops:
-                    mcts.selection()
+                    mcts.run()
                     i+=1
                 chance = (mcts.root.wins/loops)*100 # AI's chance of winning
 
@@ -96,6 +96,7 @@ class SimpleAI(player.Player):
             else:
                 continue
     
+    '''
     def simulateGame(self):
         import copy
         simGame = copy.deepcopy(self.game)
@@ -120,7 +121,8 @@ class SimpleAI(player.Player):
             return 1
         else:
             return 0
-
+    '''
+    
 class Node:
 
     def __init__(self, state):
@@ -138,21 +140,26 @@ class MCTS:
         self.AIName = AI.name
         self.game = AI.game
 
-    def selection(self):
-        if self.root.children == []:
-            self.expand(self.root)
-        else:
-            highest_value_node = Node(None)
-            for node in self.root.children:
-                if node.visits == 0:
-                    node.value = float('inf')
-                else:
-                    C = math.sqrt(2)
-                    node.value = node.value / node.visits + C * math.sqrt(math.log(node.parent.visits + 1) / node.visits) 
-                if node.value > highest_value_node.value:
-                    highest_value_node = node
-            self.expand(highest_value_node)
+    def run(self):
+        self.expand(self.selection(self.root, self.root))
     
+    def selection(self, node, highest_value_node):
+        if node.children == []:
+            if node.visits == 0:
+                node.value = float('inf')
+            else:
+                C = math.sqrt(2)
+                node.value = node.wins / node.visits + C * math.sqrt(math.log(node.parent.visits + 1) / node.visits)
+        else:
+            for child in node.children:
+                temp = self.selection(child, highest_value_node)
+                if temp.value > highest_value_node.value:
+                    highest_value_node = temp
+        if node.value > highest_value_node.value:
+            highest_value_node = node
+        return highest_value_node
+
+            
     def expand(self, node):
         new_node = Node(copy.deepcopy(node.state))
         new_node.parent = node
