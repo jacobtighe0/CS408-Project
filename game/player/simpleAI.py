@@ -62,8 +62,7 @@ class SimpleAI(player.Player):
                     i+=1
                 chance = (mcts.root.wins/loops)*100 # AI's chance of winning
 
-                print("AI chance of winning:") # --- FOR TESTING ONLY ---
-                print(chance)
+                print("\033[93mAI chance of winning: " + str(chance) + "\033[0m") # --- FOR TESTING ONLY ---
 
             if self.bet == -1:
                 if chance < 20:
