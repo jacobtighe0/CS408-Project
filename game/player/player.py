@@ -10,6 +10,7 @@ from sys import path,exit
 ui_package = p.abspath("..") + "/ui"
 path.append(ui_package)
 from ui import optionsInput, raising,allInOrFold
+from database import update_player_action
 
 class Player(object):
     def __init__(self, name = "Player", money = 500.0):
@@ -167,6 +168,7 @@ class Player(object):
                 action = optionsInput()
             choosed = options[action]()
             if choosed:
+                update_player_action(self.name, action)
                 return choosed
             else:
                 continue
