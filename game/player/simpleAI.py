@@ -41,6 +41,16 @@ class SimpleAI(player.Player):
             print("{} check".format(self.name))
             return (self.bet,0)
         
+    def calculate_ev(self, hand_strength):
+        raise_amount = self.raising()
+        call_cost = self.bet - self.deposit
+        after_raise = self.bet + raise_amount
+
+        ev_call = (hand_strength * (self.bet + self.deposit)) - ((1 - hand_strength) * call_cost)
+        ev_raise = (hand_strength * after_raise) - ((1 - hand_strength) * raise_amount)
+
+        return ev_call, ev_raise
+    
     def options(self):
         options = { 0: self.quit,
                     1: self.checkBet ,
@@ -60,24 +70,38 @@ class SimpleAI(player.Player):
                 while i<loops:
                     mcts.run()
                     i+=1
-                chance = (mcts.root.wins/loops)*100 # AI's chance of winning
+
+                chance = (mcts.root.wins/loops) # AI's chance of winning
+                ev_call, ev_raise = self.calculate_ev(chance)
 
                 print("\033[93mAI chance of winning: " + str(chance) + "\033[0m") # --- FOR TESTING ONLY ---
+                print("call: ", ev_call, "raise: ", ev_raise) # --- FOR TESTING ONLY ---
 
+            if ev_call > ev_raise and ev_call > 0:
+                action = 2
+            elif ev_raise > ev_call and ev_raise > 0:
+                action = 3
+            else:
+                if self.checkBet():
+                    action = 1
+                else:
+                    action = 4
+
+            '''
             if self.bet == -1:
-                if chance < 20:
+                if chance < .20:
                     action = 4
                 else:
                     action = 5
             else:
-                if chance < 10:
+                if chance < .10:
                     action = 4
-                elif chance < 50:
+                elif chance < .50:
                     if (self.checkBet() == False):
                         action = 2
                     else:
                         action = 1
-                elif chance < 90:
+                elif chance < .90:
                     if self.prevAction == 3: # Stops AI from raising infinitely
                         if (self.checkBet() == False):
                             action = 2
@@ -87,6 +111,7 @@ class SimpleAI(player.Player):
                         action = 3
                 else:
                     action = 5
+            '''
                 
             choosed = options[action]()
             self.prevAction = action
