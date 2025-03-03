@@ -1,5 +1,5 @@
 import math
-from random import randint
+from random import random, randint
 import player.player
 import player.simpleAI
 import copy
@@ -16,6 +16,7 @@ class SimpleAI(player.Player):
         self.game = None # Records current game being played
         self.prevAction = None # Records previous action to prevent infinite loops
         self.hand_strength = 0.0
+        self.bluff_chance = 0.2
 
     def setGame(self, game):
         self.game = game
@@ -60,6 +61,11 @@ class SimpleAI(player.Player):
 
         return ev_call, ev_raise
     
+    def should_bluff(self):
+        if random() < self.bluff_chance:
+                print("(BLUFFING) - prev hand strength:", self.hand_strength) # --- FOR TESTING ONLY ---
+                self.hand_strength = min(self.hand_strength * 1.5, 1.0) # Makes sure hand_strength doesn't exceed 1.0
+    
     def options(self):
         options = { 0: self.quit,
                     1: self.checkBet ,
@@ -80,6 +86,7 @@ class SimpleAI(player.Player):
                     i+=1
 
                 self.hand_strength = (mcts.root.wins/loops) # AI's chance of winning
+                self.should_bluff() # Decides if AI should bluff
                 ev_call, ev_raise = self.calculate_ev()
 
                 print("\033[93mAI chance of winning: " + str(self.hand_strength) + "\033[0m") # --- FOR TESTING ONLY ---
