@@ -15,6 +15,7 @@ class SimpleAI(player.Player):
         self.bet = 0.0
         self.game = None # Records current game being played
         self.prevAction = None # Records previous action to prevent infinite loops
+        self.hand_strength = 0.0
 
     def setGame(self, game):
         self.game = game
@@ -26,8 +27,16 @@ class SimpleAI(player.Player):
 
         """
         print(self.money, self.debt)
-        #return randint(1, self.money - self.debt) if self.money > self.debt else 0.0 
-        return randint(1, 1 + int((self.money - self.debt)/3)) if self.money > self.debt else 0.0 
+        return int((self.money - self.debt) * self.bet_size()) if self.money > self.debt else 0.0
+    
+    def bet_size(self):
+        
+        if self.hand_strength > .75:
+            return .75
+        elif self.hand_strength > .50:
+            return .50
+        else:
+            return .25
 
     def checkBet(self):
         """
@@ -41,13 +50,13 @@ class SimpleAI(player.Player):
             print("{} check".format(self.name))
             return (self.bet,0)
         
-    def calculate_ev(self, hand_strength):
+    def calculate_ev(self): # Calculates expected values
         raise_amount = self.raising()
         call_cost = self.bet - self.deposit
         after_raise = self.bet + raise_amount
 
-        ev_call = (hand_strength * (self.bet + self.deposit)) - ((1 - hand_strength) * call_cost)
-        ev_raise = (hand_strength * after_raise) - ((1 - hand_strength) * raise_amount)
+        ev_call = (self.hand_strength * (self.bet + self.deposit)) - ((1 - self.hand_strength) * call_cost)
+        ev_raise = (self.hand_strength * after_raise) - ((1 - self.hand_strength) * raise_amount)
 
         return ev_call, ev_raise
     
@@ -61,7 +70,6 @@ class SimpleAI(player.Player):
                     }
             
         while True:
-            chance = 0 # AI's chance of winning (initially 0)
             if self.game is not None:
 
                 loops = 5000 # Number of simulations
@@ -71,10 +79,10 @@ class SimpleAI(player.Player):
                     mcts.run()
                     i+=1
 
-                chance = (mcts.root.wins/loops) # AI's chance of winning
-                ev_call, ev_raise = self.calculate_ev(chance)
+                self.hand_strength = (mcts.root.wins/loops) # AI's chance of winning
+                ev_call, ev_raise = self.calculate_ev()
 
-                print("\033[93mAI chance of winning: " + str(chance) + "\033[0m") # --- FOR TESTING ONLY ---
+                print("\033[93mAI chance of winning: " + str(self.hand_strength) + "\033[0m") # --- FOR TESTING ONLY ---
                 print("call: ", ev_call, "raise: ", ev_raise) # --- FOR TESTING ONLY ---
 
             if ev_call > ev_raise and ev_call > 0:
