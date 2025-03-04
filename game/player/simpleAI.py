@@ -3,6 +3,7 @@ from random import random, randint
 import player.player
 import player.simpleAI
 import copy
+import database as db
 
 class SimpleAI(player.Player):
 
@@ -61,11 +62,53 @@ class SimpleAI(player.Player):
 
         return ev_call, ev_raise
     
+    def player_model(self):
+        player_name = self.game.dealer.playerControl.players[0].name # Name of non-AI player
+        player_stats = db.get_player_stats(player_name)
+        print("\033[93mSTATS:", player_stats, "\033[0m")
+        player_actions = {"checks": player_stats[4] / player_stats[9], # No of checks / No of total actions
+                          "calls": player_stats[5] / player_stats[9],
+                          "raises": player_stats[6] / player_stats[9],
+                          "folds": player_stats[7] / player_stats[9],
+                          "all_ins": player_stats[8] / player_stats[9],
+                          }
+
+        # If player checks a lot, bluff more
+        if player_actions["checks"] > 0.5:
+            self.bluff_chance = min(self.bluff_chance * 1.2, 0.75)
+            self.hand_strength = min(self.hand_strength * 1.1, 1.0)
+
+        # If player calls a lot, bluff less
+        if player_actions["calls"] > 0.4:
+            self.bluff_chance = min(self.bluff_chance * 0.5, 0.75)
+            self.hand_strength = min(self.hand_strength * 0.9, 1.0)
+
+        # If player raises a lot, bluff less. Else, bluff more
+        if player_actions["raises"] > 0.15:
+            self.bluff_chance = min(self.bluff_chance * 0.5, 0.75)
+            self.hand_strength = min(self.hand_strength * 0.8, 1.0)
+        elif player_actions["raises"] < 0.1:
+            self.bluff_chance = min(self.bluff_chance * 2, 0.75)
+            self.hand_strength = min(self.hand_strength * 1.2, 1.0)
+
+        # If player folds a lot, bluff more
+        if player_actions["folds"] > 0.2:
+            self.bluff_chance = min(self.bluff_chance * 2, 0.75)
+            self.hand_strength = min(self.hand_strength * 1.2, 1.0)
+        
+        # If player goes all-in a lot, bluff less. Else, bluff more
+        if player_actions["all_ins"] > 0.1:
+            self.bluff_chance = min(self.bluff_chance * 0.5, 0.75)
+            self.hand_strength = min(self.hand_strength * 0.5, 1.0)
+        elif player_actions["all_ins"] < 0.05:
+            self.bluff_chance = min(self.bluff_chance * 1.5, 0.75)
+            self.hand_strength = min(self.hand_strength * 1.2, 1.0)
+    
     def should_bluff(self):
         if random() < self.bluff_chance:
                 print("(BLUFFING) - prev hand strength:", self.hand_strength) # --- FOR TESTING ONLY ---
                 self.hand_strength = min(self.hand_strength * 1.5, 1.0) # Makes sure hand_strength doesn't exceed 1.0
-    
+
     def options(self):
         options = { 0: self.quit,
                     1: self.checkBet ,
@@ -86,12 +129,14 @@ class SimpleAI(player.Player):
                     i+=1
 
                 self.hand_strength = (mcts.root.wins/loops) # AI's chance of winning
+                self.player_model() # Adapts to player's playstyle
+                #print("\033[94mbluff:", self.bluff_chance, "\033[0m") # --- FOR TESTING ONLY ---
                 self.should_bluff() # Decides if AI should bluff
                 ev_call, ev_raise = self.calculate_ev()
 
                 print("\033[93mAI chance of winning: " + str(self.hand_strength) + "\033[0m") # --- FOR TESTING ONLY ---
                 print("call: ", ev_call, "raise: ", ev_raise) # --- FOR TESTING ONLY ---
-
+                
             if ev_call > ev_raise and ev_call > 0:
                 action = 2
             elif ev_raise > ev_call and ev_raise > 0:
