@@ -146,26 +146,21 @@ def straight(cards):
     """
     Five cards in order
     :returns: TODO
-
     """
     pack = []
-    for index,card in enumerate(cards):
+    for card, next_card in zip(cards, cards[1:]):
         if len(pack) == 4:
             pack.append(card)
             return pack
-        
-        try:            
-            control = cardsOrder.index(card[0]) - cardsOrder.index(cards[index+1][0])
-        except IndexError:
-            print("Index error (detector.py): " + str(cardsOrder.index(cards[index][0])))
-            
-        if control == 1:        
+
+        control = cardsOrder.index(card[0]) - cardsOrder.index(next_card[0])
+
+        if control == 1:
             pack.append(card)
         elif control == 0:
             continue
         else:
             return False
-
 
 
 def sortCards(cards):
