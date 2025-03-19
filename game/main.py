@@ -25,7 +25,7 @@ def main():
         #Showdown-cards are showed (if any players are left)
         print("\n\n\tRound #", game.rounds, end="\n\n") 
         game.players = list(allPlayers)
-
+        player = game.players[0]
         game.dealer.gameOn()
         game.dealer.giveCards()
         game.eachRound()
