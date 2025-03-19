@@ -106,8 +106,9 @@ class SimpleAI(player.Player):
     
     def should_bluff(self):
         if random() < self.bluff_chance:
-                print("(BLUFFING) - prev hand strength:", self.hand_strength) # --- FOR TESTING ONLY ---
-                self.hand_strength = min(self.hand_strength * 1.5, 1.0) # Makes sure hand_strength doesn't exceed 1.0
+                print("\033[93m(BLUFFING) - prev hand strength:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
+                self.hand_strength = self.hand_strength + ((1.0 - self.hand_strength) / 2)
+                print("\033[93m(BLUFFING) - new hand strength:", self.hand_strength, "\033[0m")
 
     def options(self):
         options = { 0: self.quit,
@@ -129,9 +130,11 @@ class SimpleAI(player.Player):
                     i+=1
 
                 self.hand_strength = (mcts.root.wins/loops) # AI's chance of winning
+                print("\033[94mbefore player model:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
                 self.player_model() # Adapts to player's playstyle
-                #print("\033[94mbluff:", self.bluff_chance, "\033[0m") # --- FOR TESTING ONLY ---
+                print("\033[94mbefore should bluff:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
                 self.should_bluff() # Decides if AI should bluff
+                print("\033[94mafter should bluff:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
                 ev_call, ev_raise = self.calculate_ev()
 
                 print("\033[93mAI chance of winning: " + str(self.hand_strength) + "\033[0m") # --- FOR TESTING ONLY ---
