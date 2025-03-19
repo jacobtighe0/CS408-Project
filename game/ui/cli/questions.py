@@ -8,20 +8,25 @@ Description: The CLI of the game on terminal. Collects input from the player and
 def nameQuest():
     """
     Asks about name of the player
-    :returns: TODO
-
+    :returns: entered username
     """
-    x = input("What is your name (Player0): ")  
-    return x if x != "" else "Player0"
+    while True:
+        x = input("Enter your username: ")
+        if x:
+            return x
+        print("Please enter a valid username.")
 
 def diffQuest():
     """
     Asks about difficulty of game
     :returns: difficulty
     """
-    x = input("Choose difficulty (easy/normal/hard) [easy]: ") 
-    return x if x != "" else "easy"
-    
+    inputList = ["easy", "normal", "hard"]
+    while True:
+        x = input("Choose difficulty (easy/normal/hard): ").lower()
+        if x in inputList:
+            return x
+        print("Please enter a valid difficulty.")    
 
 def info(name, money):
     """
@@ -51,19 +56,15 @@ def numQuest():
 
     """
     while True:
+        x = input("How many players do you want to play with? (1-9): ")
         try:
-            x = input("How many players do you want to play with? (1-9)[2]: ")
+            numPlayers = int(x)
+            if 1 <= numPlayers <= 9:
+                return numPlayers
         except ValueError:
-            print("You need to input a number between 1 and 10")
-        finally:
-            if x == "":
-                numPlayers = 2
-                return numPlayers
-            elif int(x) > 10 or int(x) < 1:
-                print("Out of the range, Try again.")
-             
-            else:
-                numPlayers = int(x)
-                return numPlayers
+            pass
+        print("Please enter a number between 1 and 9.")
+
+
  
 
