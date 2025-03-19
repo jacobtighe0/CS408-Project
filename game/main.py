@@ -7,8 +7,10 @@ def main():
     """ 
     Work to create game
     """
+    system('cls')
     game = poker.Game()
     initialise_db()
+    print("")
     print("Let's play Texas Hold'em!\n")
     allPlayers = game.createPlayers()
     while True:
@@ -23,13 +25,6 @@ def main():
         #Showdown-cards are showed (if any players are left)
         print("\n\n\tRound #", game.rounds, end="\n\n") 
         game.players = list(allPlayers)
-        player = game.players[0]
-        player_stats = get_player_stats(player.name)
-        print(player_stats)
-        if player_stats:
-            print(f"Welcome back, {player_stats[1]}! Wins: {player_stats[2]}, Losses: {player_stats[3]}")
-        else:
-            print("New player detected!")
 
         game.dealer.gameOn()
         game.dealer.giveCards()
