@@ -161,7 +161,7 @@ class Game(object):
 
         """
         for player in self.players:
-            if player.bet == -1:
+            if player.money == 0:
                 return True
         return False
 
