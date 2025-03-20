@@ -116,21 +116,19 @@ class Player(object):
        return (self.bet,-1)
 
     def allin(self):
-       """
-       Gives all money to the pot
+        """
+        Gives all money to the pot
 
-       :currentBet: Money on pot
-       :returns: currentBet with all player's money
+        :currentBet: Money on pot
+        :returns: currentBet with all player's money
 
-       """
-       #currentBet += self.money
-       print("{} all in!".format(self.name))
-       self.deposit += self.money
-       self.bet = -1
-       #self.deposit = -1
-       money = self.money
-       self.money = 0
-       return (-1,money)
+        """
+        all_in_amount = self.money
+        print("{} all in! ({})".format(self.name, all_in_amount))
+        self.deposit += all_in_amount
+        self.bet += all_in_amount
+        self.money = 0 
+        return (self.bet, all_in_amount)
 
     def quit(self):
         print("Exiting program. Hope you will come back again.")
