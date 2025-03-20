@@ -34,8 +34,10 @@ def main():
         game.showdown()
         game.dealer.endGame()
         if len(game.dealer.playerControl.players) == 1:
+            print("")
             print("Final winner is:", game.dealer.playerControl.players[0].name)
-            print("Money: ", game.dealer.playerControl.players[0].money)
+            print("Money: ", int(game.dealer.playerControl.players[0].money))
+            print("")
             win = False
             if game.dealer.playerControl.players[0].name == player.name:
                 win = True

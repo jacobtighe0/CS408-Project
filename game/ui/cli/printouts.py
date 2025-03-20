@@ -50,8 +50,11 @@ def optionsInput():
             print("\t0) Exit")
             print("[0-5]")
             try:
-                return int(input(">")) % 6
-            except:
-                print("You need to put number.")
+                user_input = int(input("> "))
+                if user_input in [1, 2, 3, 4, 5, 0]:
+                    return user_input
+            except ValueError:
+                pass
+            print("Please enter a number between 0 and 5.")
 
 

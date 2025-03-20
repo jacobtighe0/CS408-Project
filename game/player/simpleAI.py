@@ -29,7 +29,7 @@ class SimpleAI(player.Player):
         :returns: TODO
 
         """
-        print(self.money, self.debt)
+        #print(self.money, self.debt)
         return int((self.money - self.debt) * self.bet_size()) if self.money > self.debt else 0.0
     
     def bet_size(self):
@@ -66,7 +66,7 @@ class SimpleAI(player.Player):
     def player_model(self):
         player_name = self.game.dealer.playerControl.players[0].name # Name of non-AI player
         player_stats = db.get_player_stats(player_name)
-        print("\033[93mSTATS:", player_stats, "\033[0m")
+        #print("\033[93mSTATS:", player_stats, "\033[0m")
         player_actions = {"checks": player_stats[4] / player_stats[9], # No of checks / No of total actions
                           "calls": player_stats[5] / player_stats[9],
                           "raises": player_stats[6] / player_stats[9],
@@ -107,9 +107,9 @@ class SimpleAI(player.Player):
     
     def should_bluff(self):
         if random() < self.bluff_chance:
-                print("\033[93m(BLUFFING) - prev hand strength:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
+                #print("\033[93m(BLUFFING) - prev hand strength:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
                 self.hand_strength = self.hand_strength + ((1.0 - self.hand_strength) / 2)
-                print("\033[93m(BLUFFING) - new hand strength:", self.hand_strength, "\033[0m")
+                #print("\033[93m(BLUFFING) - new hand strength:", self.hand_strength, "\033[0m")
 
     def options(self):
         options = { 0: self.quit,
@@ -119,7 +119,8 @@ class SimpleAI(player.Player):
                     4: self.foldBet , 
                     5: self.allin,
                     }
-            
+        print("")
+        print("Waiting on opponent...")
         while True:
             if self.game is not None:
 
@@ -131,15 +132,15 @@ class SimpleAI(player.Player):
                     i+=1
 
                 self.hand_strength = (mcts.root.wins/loops) # AI's chance of winning
-                print("\033[94mbefore player model:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
+                #print("\033[94mbefore player model:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
                 self.player_model() # Adapts to player's playstyle
-                print("\033[94mbefore should bluff:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
+                #print("\033[94mbefore should bluff:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
                 self.should_bluff() # Decides if AI should bluff
-                print("\033[94mafter should bluff:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
+                #print("\033[94mafter should bluff:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
                 ev_call, ev_raise = self.calculate_ev()
 
-                print("\033[93mAI chance of winning: " + str(self.hand_strength) + "\033[0m") # --- FOR TESTING ONLY ---
-                print("call: ", ev_call, "raise: ", ev_raise) # --- FOR TESTING ONLY ---
+                #print("\033[93mAI chance of winning: " + str(self.hand_strength) + "\033[0m") # --- FOR TESTING ONLY ---
+                #print("call: ", ev_call, "raise: ", ev_raise) # --- FOR TESTING ONLY ---
                 
             if ev_call > ev_raise and ev_call > 0:
                 action = 2

@@ -36,7 +36,7 @@ def info(name, money):
 
     """
     print("Name: {}".format(name))
-    print("Balance: {}".format(money))
+    print("Balance: {}".format(int(money)))
 
 def raising(minimum, maximum):
     """
@@ -45,8 +45,15 @@ def raising(minimum, maximum):
     :returns: TODO
 
     """
-    #return raised if raised == type(int) and raised >= minimal and raised <= maximum else False
-    return int(input("How much do you want to raise [{0}-{1}]: ".format(maximum, minimum)))
+    while True:
+        try:
+            user_input = int(input("How much do you want to raise? (between {0} and {1}): ".format(minimum, int(maximum))))
+            if user_input < minimum or user_input > maximum:
+                print("Please enter a number between {0} and {1}.".format(minimum, int(maximum)))
+            else:
+                return user_input
+        except ValueError:
+            print("Please enter a valid integer.")
 
 def numQuest():
     """
