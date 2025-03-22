@@ -68,11 +68,11 @@ class SimpleAI(player.Player):
         player_name = self.game.dealer.playerControl.players[0].name # Name of non-AI player
         player_stats = db.get_player_stats(player_name)
         #print("\033[93mSTATS:", player_stats, "\033[0m")
-        player_actions = {"checks": player_stats[4] / player_stats[9], # No of checks / No of total actions
-                          "calls": player_stats[5] / player_stats[9],
-                          "raises": player_stats[6] / player_stats[9],
-                          "folds": player_stats[7] / player_stats[9],
-                          "all_ins": player_stats[8] / player_stats[9],
+        player_actions = {"checks": player_stats[3] / player_stats[8], # No of checks / No of total actions
+                          "calls": player_stats[4] / player_stats[8],
+                          "raises": player_stats[5] / player_stats[8],
+                          "folds": player_stats[6] / player_stats[8],
+                          "all_ins": player_stats[7] / player_stats[8],
                           }
 
         # If player checks a lot, bluff more
