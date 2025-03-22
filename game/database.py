@@ -1,8 +1,9 @@
 import sqlite3
 
+database = "game_data.db"
 def initialise_db():
     # Connect to (or create) the database file
-    conn = sqlite3.connect("game_data.db")  # Saves locally in the game folder
+    conn = sqlite3.connect(database)  # Saves locally in the game folder
     cursor = conn.cursor()
 
     # Enable foreign key support in SQLite
@@ -41,7 +42,7 @@ def initialise_db():
     conn.close()   # Close connection
 
 def add_initial_difficulty(name, difficulty, elo):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # Check if the player exists
@@ -57,7 +58,7 @@ def add_initial_difficulty(name, difficulty, elo):
     conn.close()
 
 def update_player_wins(name, win, elo_change):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # Check if the player exists
@@ -85,7 +86,7 @@ def update_player_wins(name, win, elo_change):
     conn.close()
 
 def update_player_action(name, action):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # Check if the player exists
@@ -115,7 +116,7 @@ def update_player_action(name, action):
     conn.close()
 
 def get_player_stats(name):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM player_stats WHERE name = ?", (name,))
@@ -125,7 +126,7 @@ def get_player_stats(name):
     return player
 
 def get_game_results(name):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM game_results WHERE player_name = ?", (name,))
@@ -135,7 +136,7 @@ def get_game_results(name):
     return player
 
 def write_player_stats(filename):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # Fetch all player statistics
@@ -155,7 +156,7 @@ def write_player_stats(filename):
 
     conn.close()
 def write_game_results(filename):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # Fetch all game results for the player
