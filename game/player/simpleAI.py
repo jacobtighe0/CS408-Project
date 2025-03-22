@@ -8,7 +8,7 @@ from ai.mcts import MCTS
 
 class SimpleAI(player.Player):
 
-    def __init__(self, name = "simpleAI", money = 500.0):
+    def __init__(self, name = "AI_", money = 500.0):
         self.name = name
         self.money = money
         self.handValue = 0.0

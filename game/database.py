@@ -20,7 +20,7 @@ def initialise_db():
             folds INTEGER DEFAULT 0,
             all_ins INTEGER DEFAULT 0,
             total_actions INTEGER DEFAULT 0,
-            elo INTEGER DEFAULT 1000,
+            elo INTEGER DEFAULT 0,
             initial_difficulty TEXT
         )
     ''')
@@ -40,8 +40,7 @@ def initialise_db():
     conn.commit()  # Save changes
     conn.close()   # Close connection
 
-def add_initial_difficulty(name, difficulty):
-    print(f"Setting difficulty for {name} to {difficulty}")  # Debugging line
+def add_initial_difficulty(name, difficulty, elo):
     conn = sqlite3.connect("game_data.db")
     cursor = conn.cursor()
 
@@ -50,9 +49,9 @@ def add_initial_difficulty(name, difficulty):
     player = cursor.fetchone()
         
     if player:
-        cursor.execute("UPDATE player_stats SET initial_difficulty = ? WHERE name = ?", (difficulty, name))
+        cursor.execute("UPDATE player_stats SET initial_difficulty = ?, elo = ? WHERE name = ?", (difficulty, elo, name))
     else:
-        cursor.execute("INSERT INTO player_stats (name, initial_difficulty) VALUES (?, ?)", (name, difficulty))
+        cursor.execute("INSERT INTO player_stats (name, initial_difficulty, elo) VALUES (?, ?, ?)", (name, difficulty, elo))
 
     conn.commit()
     conn.close()
@@ -68,9 +67,9 @@ def update_player_wins(name, win, elo_change):
     if player:
         # Update existing player's stats
         if win:
-            cursor.execute("UPDATE player_stats SET wins = wins + 1 WHERE name = ?", (name,))
+            cursor.execute("UPDATE player_stats SET wins = wins + 1, elo = elo + ? WHERE name = ?", (elo_change, name))
         else:
-            cursor.execute("UPDATE player_stats SET losses = losses + 1 WHERE name = ?", (name,))
+            cursor.execute("UPDATE player_stats SET losses = losses + 1, elo = elo + ? WHERE name = ?", (elo_change, name,))
 
         # Insert into game_results
         cursor.execute("INSERT INTO game_results (player_name, games_played, result, elo_change) VALUES (?, ?, ?, ?)",

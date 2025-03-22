@@ -25,13 +25,20 @@ class Game(object):
         if not player_stats: # If player is new, ask for difficulty and number of players
             print("New player detected!")
             difficulty = ui.diffQuest()
-            add_initial_difficulty(name, difficulty)
+            elo = 0
+            if difficulty == "easy":
+                elo = 350
+            elif difficulty == "normal":
+                elo = 500
+            elif difficulty == "hard":
+                elo = 650
+            add_initial_difficulty(name, difficulty, elo)
             numPlayers = ui.numQuest()
         else: # If player is not new, just ask for number of players, then print their stats
             numPlayers = ui.numQuest()
             print("")
-            print(f"Welcome back, {player_stats[0]}! Wins: {player_stats[1]}, Losses: {player_stats[2]}")
-            difficulty = "normal"
+            print(f"Welcome back, {player_stats[0]}!\nWins: {player_stats[1]}\t Losses: {player_stats[2]}\t Elo: {player_stats[9]}")
+            difficulty = get_player_stats(player_stats[10])
 
         money = 500
         return self.dealer.playerControl.createPlayers(name,numPlayers, money, difficulty)

@@ -40,10 +40,10 @@ def main():
                 print("Money: ", int(game.dealer.playerControl.players[0].money))
                 print("")
                 win = False
-                elo = -10
+                elo = -15
                 if game.dealer.playerControl.players[0].name == player.name:
                     win = True
-                    elo = 10
+                    elo = 25
                 update_player_wins(player.name, win, elo)
                 write_player_stats("player_stats.txt")
                 write_game_results("game_results.txt")
