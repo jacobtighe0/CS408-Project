@@ -48,7 +48,7 @@ def main():
                 write_player_stats()
                 write_game_results()
                 break
-            input("Press Enter to continue.")        
+            input("\nPress Enter to continue. ")        
             
             game.rounds += 1
 

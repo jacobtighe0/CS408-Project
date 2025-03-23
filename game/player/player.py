@@ -58,7 +58,7 @@ class Player(object):
            self.money -= self.bet - self.deposit
            previousDebt = self.debt
            self.deposit = self.bet
-           print("{} calls.".format(self.name))
+           print("{} calls.\n".format(self.name))
            return (self.bet,previousDebt)
 
     def raising(self):
@@ -90,7 +90,7 @@ class Player(object):
                 debt = self.debt
                 self.bet += raised
                 self.deposit = self.bet
-                print("{} raises by {}".format(self.name,raised))
+                print("{} raises by {}\n".format(self.name,raised))
                 return (self.bet,debt + raised)
                 #  problem with reraising. Fix it somehow!:  <05-09-19, dave> # 
 
@@ -104,7 +104,7 @@ class Player(object):
             print("Cannot perform check.", self.name)
             return False
         else:
-            print("{} checks.".format(self.name))
+            print("{} checks.\n".format(self.name))
             return (self.bet,0)
 
     def foldBet(self):
@@ -112,7 +112,7 @@ class Player(object):
        :returns: self
 
        """
-       print("{} folds.".format(self.name))
+       print("{} folds.\n".format(self.name))
        return (self.bet,-1)
 
     def allin(self):
@@ -124,7 +124,7 @@ class Player(object):
 
         """
         all_in_amount = self.money
-        print("{} goes all in! ({})".format(self.name, int(all_in_amount)))
+        print("{} goes all in! ({})\n".format(self.name, int(all_in_amount)))
         self.deposit += all_in_amount
         self.bet += all_in_amount
         self.money = 0 

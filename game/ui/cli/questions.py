@@ -76,9 +76,14 @@ def newPlayerInfo():
     """
     Prints out information for new players
     """
-    print("\nNew player detected!\n")
-    print("You will start on easy difficulty, with a score of 0.\nYour score will +/- depending on the game result.\n- Reach 100 score to advance to medium.\n- Reach 200 score to advance to hard.")
-    input("\nPress Enter to continue. ")     
+    print("\nNew player detected!")
+    print("\nDifficulty levels:")
+    print("- Easy (0-99): AI makes predictable moves.")
+    print("- Medium (100-199): AI adapts to its opponent.")
+    print("- Hard (200+): AI starts bluffing.")
+    print("\nYou will start on easy.")
+    print("Increase your score by winning!")
+    input("\nPress Enter to play. ")     
 
 def stats(name, wins, losses, elo, difficulty):
     """

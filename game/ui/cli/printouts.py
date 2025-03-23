@@ -7,7 +7,7 @@ def roundWinners(names):
 
     """
     if len(names) == 1:
-        print("The winner is ",names[0])
+        print("\nThe winner is",names[0])
     else:
         print("Winners are: ", end="")
         for name in names:

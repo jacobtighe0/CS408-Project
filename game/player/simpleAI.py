@@ -48,7 +48,7 @@ class SimpleAI(player.Player):
         if self.debt:
             return False
         else:
-            print("{} checks.".format(self.name))
+            print("{} checks.\n".format(self.name))
             return (self.bet,0)
         
     def calculate_ev(self):
@@ -129,8 +129,7 @@ class SimpleAI(player.Player):
                     4: self.foldBet , 
                     5: self.allin,
                     }
-        print("")
-        print("Waiting on opponent...")
+        print(f"Waiting on {self.name}...")
         while True:
             if self.game is not None:
 
