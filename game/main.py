@@ -7,10 +7,10 @@ def main():
     """ 
     Work to create game
     """
-    system('cls')
     initialise_db()
     while True:
         game = poker.Game()
+        system('cls')
         print("")
         print("Let's play Texas Hold'em!\n")
         allPlayers = game.createPlayers()
