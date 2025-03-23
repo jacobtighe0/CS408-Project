@@ -24,12 +24,7 @@ class SimpleAI(player.Player):
         self.game = game
 
     def raising(self, raising = None):
-        """
-        Function for getting random input
-        :returns: TODO
-
-        """
-        #print(self.money, self.debt)
+        ":returns: The amount of money the AI should raise by"
         return int((self.money - self.debt) * self.bet_size()) if self.money > self.debt else 0.0
     
     def bet_size(self): # Calculates how much the AI should bet, returns a percent
@@ -54,13 +49,20 @@ class SimpleAI(player.Player):
             print("{} checks.".format(self.name))
             return (self.bet,0)
         
-    def calculate_ev(self): # Calculates expected values
-        raise_amount = self.raising()
-        call_cost = self.bet - self.deposit
-        after_raise = self.bet + raise_amount
+    def calculate_ev(self):
+        ":returns: Expected values for calling and raising"
 
+        # Calculation to get the expected value of calling
+        call_cost = self.bet - self.deposit # aka debt
         ev_call = (self.hand_strength * (self.bet + self.deposit)) - ((1 - self.hand_strength) * call_cost)
-        ev_raise = (self.hand_strength * after_raise) - ((1 - self.hand_strength) * raise_amount)
+
+        # Calculation to get the expected value of raising
+        raise_amount = self.raising()
+        if raise_amount > 0:
+            bet_after_raising = self.bet + raise_amount
+            ev_raise = (self.hand_strength * bet_after_raising) - ((1 - self.hand_strength) * raise_amount)
+        else: # If raise_amount <= 0, then raising is not an option
+            ev_raise = float('-inf')
 
         return ev_call, ev_raise
     
