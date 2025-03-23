@@ -72,6 +72,21 @@ def numQuest():
             pass
         print("Please enter a number between 1 and 9.")
 
+def newPlayerInfo():
+    """
+    Prints out information for new players
+    """
+    print("\nNew player detected!\n")
+    print("You will start on easy difficulty, with a score of 0.\nYour score will +/- depending on the game result.\n- Reach 100 score to advance to medium.\n- Reach 200 score to advance to hard.")
+    input("\nPress Enter to continue. ")     
+
+def stats(name, wins, losses, elo, difficulty):
+    """
+    Prints out player stats
+    """
+    print(f"Player: {name}\nWins: {wins}\nLosses: {losses}\nScore: {elo} ({difficulty})")
+
+
 
  
 

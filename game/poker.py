@@ -8,7 +8,7 @@ import ui
 import dealer
 from player import Player, SimpleAI
 from database import get_player_stats, get_game_results
-
+from os import system
 class Game(object):
     """
     Creates players based on inputs on call.
@@ -22,14 +22,31 @@ class Game(object):
         name = ui.nameQuest()
         player_stats = get_player_stats(name)
         numPlayers = ui.numQuest()
-        print("")
+
         if not player_stats: # If player is new, ask for number of players
-            print("New player detected!")
+            system('cls')
+            ui.newPlayerInfo()
+            wins = 0
+            losses = 0
+            elo = 0
         else: # If player is not new, just ask for number of players, then print their stats
-            print(f"Welcome back, {player_stats[0]}!\nWins: {player_stats[1]}\t Losses: {player_stats[2]}\t Elo: {player_stats[9]}")
+            wins = player_stats[1]
+            losses = player_stats[2]
+            elo = player_stats[9]
+
+        if elo < 100:
+            difficulty = "easy"
+        elif elo < 200:
+            difficulty = "medium"
+        else:
+            difficulty = "hard"
+
+        system('cls')
+        print("")
+        ui.stats(name, wins, losses, elo, difficulty)
 
         money = 500
-        return self.dealer.playerControl.createPlayers(name,numPlayers, money, "easy")
+        return self.dealer.playerControl.createPlayers(name,numPlayers, money, difficulty)
 
     def controlDeposit(self):
         """

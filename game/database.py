@@ -143,7 +143,7 @@ def write_player_stats():
     # Open a text file for writing (or create it if it doesn't exist)
     with open(player_stats_file, "w") as file:
         if player_stats:
-            file.write(f"{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Elo':<6}{'Win Streak'}\n")
+            file.write(f"{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Score':<6}{'Win Streak'}\n")
             # Write each player's statistics
             for player in player_stats:
                 file.write(f"{player[0]:<10}{player[1]:<6}{player[2]:<8}{player[3]:<8}{player[4]:<8}{player[5]:<8}{player[6]:<8}{player[7]:<10}{player[8]:<15}{player[9]:<6}{player[10]}\n")
