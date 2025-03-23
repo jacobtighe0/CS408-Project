@@ -134,6 +134,10 @@ class SimpleAI(player.Player):
         while True:
             if self.game is not None:
 
+                player_name = self.game.dealer.playerControl.players[0].name
+                player_stats = db.get_player_stats(player_name)
+                player_elo = player_stats[9]
+
                 loops = 5000 # Number of simulations
                 mcts = MCTS(self)
                 i = 0
@@ -143,15 +147,14 @@ class SimpleAI(player.Player):
                 self.hand_strength = (mcts.root.wins/loops) # AI's chance of winning
                 self.bluff_chance = 0.2 # Resets bluff chance
 
-                #print("\033[94mHand strength before player model:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
-                self.player_model()
-                #print("\033[94mHand strength before should bluff:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
-                self.should_bluff()
-                #print("\033[94mHand strength after should bluff:", self.hand_strength, "\033[0m") # --- FOR TESTING ONLY ---
-                ev_call, ev_raise = self.calculate_ev()
+                # If player is at 'medium' level or higher, use player model
+                if player_elo >= 75:
+                    self.player_model()
+                # If player is at 'hard' level or higher, start bluffing
+                if player_elo >= 175:
+                    self.should_bluff()
 
-                #print("\033[93mAI chance of winning: " + str(self.hand_strength) + "\033[0m") # --- FOR TESTING ONLY ---
-                #print("call: ", ev_call, "raise: ", ev_raise) # --- FOR TESTING ONLY ---
+                ev_call, ev_raise = self.calculate_ev()
                 
             if ev_call > ev_raise and ev_call > 0:
                 action = 2
