@@ -101,7 +101,7 @@ class Player(object):
         :returns: True/False based on if you can check or not
         """
         if self.debt:
-            print("Cannot perform check.", self.name)
+            print("You can't check because another player raised.\n")
             return False
         else:
             print("{} checks.\n".format(self.name))
