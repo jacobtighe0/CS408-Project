@@ -22,7 +22,8 @@ def initialise_db():
             all_ins INTEGER DEFAULT 0,
             total_actions INTEGER DEFAULT 0,
             elo INTEGER DEFAULT 0,
-            initial_difficulty TEXT
+            initial_difficulty TEXT,
+            win_streak INTEGER DEFAULT 0
         )
     ''')
 
@@ -57,7 +58,7 @@ def add_initial_difficulty(name, difficulty, elo):
     conn.commit()
     conn.close()
 
-def update_player_wins(name, win, elo_change):
+def update_player_wins(name, win, elo):
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
@@ -65,16 +66,22 @@ def update_player_wins(name, win, elo_change):
     cursor.execute("SELECT * FROM player_stats WHERE name = ?", (name,))
     player = cursor.fetchone()
 
+    # If player has a win streak, scale Elo accordingly
+    cursor.execute("SELECT win_streak FROM player_stats WHERE name = ?", (name,))
+    x = cursor.fetchone()
+    win_streak = x[0] if x else 0
+    elo_change = elo * (win_streak + 1)
+
     if player:
         # Update existing player's stats
         if win:
-            cursor.execute("UPDATE player_stats SET wins = wins + 1, elo = elo + ? WHERE name = ?", (elo_change, name))
+            cursor.execute("UPDATE player_stats SET wins = wins + 1, win_streak = win_streak + 1, elo = elo + ? WHERE name = ?", (elo_change, name))
         else:
-            cursor.execute("UPDATE player_stats SET losses = losses + 1, elo = elo + ? WHERE name = ?", (elo_change, name,))
+            cursor.execute("UPDATE player_stats SET losses = losses + 1, win_streak = 0, elo = elo + ? WHERE name = ?", (elo, name,))
 
         # Insert into game_results
         cursor.execute("INSERT INTO game_results (player_name, games_played, result, elo_change) VALUES (?, ?, ?, ?)",
-            (name, (player[1]+player[2])+1, 'win' if win else 'loss', elo_change))
+            (name, (player[1]+player[2])+1, 'win' if win else 'loss', elo_change if win else elo))
         # Update games_played by 1 and add the result to the game_results table
         #cursor.execute("UPDATE game_results SET games_played = games_played + 1 WHERE player_name = ?", (name,))
     else:
@@ -146,15 +153,15 @@ def write_player_stats(filename):
     # Open a text file for writing (or create it if it doesn't exist)
     with open(filename, "w") as file:
         if player_stats:
-            file.write(f"{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Elo':<6}{'Initial difficulty'}\n")
+            file.write(f"{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Elo':<6}{'Initial difficulty':<20}{'Win Streak'}\n")
             # Write each player's statistics
             for player in player_stats:
-                file.write(f"{player[0]:<10}{player[1]:<6}{player[2]:<8}{player[3]:<8}{player[4]:<8}{player[5]:<8}{player[6]:<8}{player[7]:<10}{player[8]:<15}{player[9]:<6}{player[10]}\n")
+                file.write(f"{player[0]:<10}{player[1]:<6}{player[2]:<8}{player[3]:<8}{player[4]:<8}{player[5]:<8}{player[6]:<8}{player[7]:<10}{player[8]:<15}{player[9]:<6}{player[10]:<20}{player[11]}\n")
         else:
             file.write("No player statistics found.\n")
 
-
     conn.close()
+    
 def write_game_results(filename):
     conn = sqlite3.connect(database)
     cursor = conn.cursor()

@@ -40,7 +40,7 @@ def main():
                 print("Money: ", int(game.dealer.playerControl.players[0].money))
                 print("")
                 win = False
-                elo = -15
+                elo = -25
                 if game.dealer.playerControl.players[0].name == player.name:
                     win = True
                     elo = 25
