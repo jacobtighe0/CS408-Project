@@ -94,11 +94,11 @@ def pair(histogram, cards):
     Calculates cardValue of hand
     :returns: value of hanhistogram
     """
+    pack = []
     for i in histogram:
         if histogram[i] == 1:
-            return find(cards, i)
-
-    return False
+            pack.append(find(cards, i))
+    return pack if len(pack) == 1 else False
 
 
 def twoPairs(histogram, cards):
@@ -112,7 +112,7 @@ def twoPairs(histogram, cards):
     for i in histogram:
         if histogram[i] == 1:
             pack.append(find(cards, i))
-    return pack if len(pack) == 2 else False
+    return pack if len(pack) >= 2 else False
 
 
 def threeOfKind(histogram, cards):
@@ -259,6 +259,7 @@ def findHandValue(cards):
                fourOfKind(histogram, cards),
                fullHouse(histogram, cards),
                flush(cards),
+               straight(cards),
                threeOfKind(histogram, cards),
                twoPairs(histogram, cards),
                pair(histogram, cards),]
@@ -267,6 +268,8 @@ def findHandValue(cards):
         if option:
             #royalflush has lowest index so we invert values 
             #bigger number means better hand 
-            return (8 - index) + highCard(cards)
+            print((9 - index) + highCard(cards))
+            return (9 - index) + highCard(cards)
+    print(highCard(cards))
     return highCard(cards)
 
