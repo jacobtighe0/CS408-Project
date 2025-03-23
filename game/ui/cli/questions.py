@@ -35,8 +35,8 @@ def info(name, money):
     :returns: 
 
     """
-    print("Name: {}".format(name))
-    print("Balance: {}".format(int(money)))
+    #print("Name: {}".format(name))
+    print("Your balance: {}".format(int(money)))
 
 def raising(minimum, maximum):
     """

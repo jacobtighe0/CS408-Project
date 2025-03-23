@@ -189,4 +189,7 @@ class Game(object):
         else:
             #Turn
             self.startPhase("Turn")
+        #River
+        self.startPhase("River")
+
 
