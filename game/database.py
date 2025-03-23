@@ -40,6 +40,7 @@ def initialise_db():
             games_played INTEGER DEFAULT 0,
             result TEXT CHECK(result IN ('win', 'loss')),
             elo_change INTEGER,
+            starting_elo INTEGER,
             FOREIGN KEY (player_name) REFERENCES player_stats(name)
         )
     ''')
@@ -70,10 +71,8 @@ def update_player_wins(name, win, elo):
             cursor.execute("UPDATE player_stats SET losses = losses + 1, win_streak = 0, elo = elo + ? WHERE name = ?", (elo_change, name,))
 
         # Insert into game_results
-        cursor.execute("INSERT INTO game_results (player_name, games_played, result, elo_change) VALUES (?, ?, ?, ?)",
-            (name, (player[1]+player[2])+1, 'win' if win else 'loss', elo_change))
-        # Update games_played by 1 and add the result to the game_results table
-        #cursor.execute("UPDATE game_results SET games_played = games_played + 1 WHERE player_name = ?", (name,))
+        cursor.execute("INSERT INTO game_results (player_name, games_played, result, elo_change, starting_elo) VALUES (?, ?, ?, ?, ?)",
+            (name, (player[1]+player[2])+1, 'win' if win else 'loss', elo_change, player[9]))
     else:
         # Create new player record
         cursor.execute("INSERT INTO player_stats (name, wins, losses) VALUES (?, ?, ?)",
@@ -163,10 +162,10 @@ def write_game_results():
     # Open a text file for writing (or create it if it doesn't exist)
     with open(game_results_file, "w") as file:
         if game_results:
-            file.write(f"{'ID':<5}{'Name':<10}{'Played':<8}{'Result':<8}{'Elo Gain'}\n")
+            file.write(f"{'ID':<5}{'Name':<10}{'Played':<8}{'Score':<7}{'Result':<8}{'Elo Gain':<10}{'New Score'}\n")
             # Write each game result (ID, Player name, Result, Elo change)
             for result in game_results:
-                file.write(f"{result[0]:<5}{result[1]:<10}{result[2]:<8}{result[3]:<8}{result[4]}\n")
+                file.write(f"{result[0]:<5}{result[1]:<10}{result[2]:<8}{result[5]:<7}{result[3]:<8}{result[4]:<10}{result[5]+result[4]}\n")
         else:
             file.write("No game results found.\n")
 
