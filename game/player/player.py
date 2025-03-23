@@ -131,7 +131,7 @@ class Player(object):
         return (self.bet, all_in_amount)
 
     def quit(self):
-        print("Exiting program. Hope you will come back again.")
+        print("\nExiting. Goodbye!\n")
         exit()
     
     def options(self):
