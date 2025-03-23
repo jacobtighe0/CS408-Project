@@ -63,7 +63,7 @@ def update_player_wins(name, win, elo):
     if player:
         # Update existing player's stats
         if win:
-            elo_change = elo * (win_streak + 1)
+            elo_change = elo * 2 if win_streak > 1 else elo
             cursor.execute("UPDATE player_stats SET wins = wins + 1, win_streak = win_streak + 1, elo = elo + ? WHERE name = ?", (elo_change, name))
         else:
             elo_change = elo if player[9] > 0 else 0

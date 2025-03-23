@@ -148,10 +148,10 @@ class SimpleAI(player.Player):
                 self.bluff_chance = 0.2 # Resets bluff chance
 
                 # If player is at 'medium' level or higher, use player model
-                if player_elo >= 75:
+                if player_elo >= 100:
                     self.player_model()
                 # If player is at 'hard' level or higher, start bluffing
-                if player_elo >= 175:
+                if player_elo >= 200:
                     self.should_bluff()
 
                 ev_call, ev_raise = self.calculate_ev()

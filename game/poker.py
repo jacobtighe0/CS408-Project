@@ -185,6 +185,7 @@ class Game(object):
             #Turn
             self.startPhase("Turn")
         #River
-        self.startPhase("River")
+        if not self.isAllIn():
+            self.startPhase("River")
 
 
