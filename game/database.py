@@ -1,6 +1,12 @@
 import sqlite3
+import os
 
-database = "game_data.db"
+current_directory = os.path.dirname(os.path.abspath(__file__))
+# Saves the database and text files in the same directory as this file
+database = os.path.join(current_directory, "game_data.db")
+player_stats_file = os.path.join(current_directory, "player_stats.txt")
+game_results_file = os.path.join(current_directory, "game_results.txt")
+
 def initialise_db():
     # Connect to (or create) the database file
     conn = sqlite3.connect(database)  # Saves locally in the game folder
@@ -142,7 +148,7 @@ def get_game_results(name):
     conn.close()
     return player
 
-def write_player_stats(filename):
+def write_player_stats():
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
@@ -151,7 +157,7 @@ def write_player_stats(filename):
     player_stats = cursor.fetchall()
 
     # Open a text file for writing (or create it if it doesn't exist)
-    with open(filename, "w") as file:
+    with open(player_stats_file, "w") as file:
         if player_stats:
             file.write(f"{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Elo':<6}{'Initial difficulty':<20}{'Win Streak'}\n")
             # Write each player's statistics
@@ -162,7 +168,7 @@ def write_player_stats(filename):
 
     conn.close()
     
-def write_game_results(filename):
+def write_game_results():
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
@@ -171,7 +177,7 @@ def write_game_results(filename):
     game_results = cursor.fetchall()
 
     # Open a text file for writing (or create it if it doesn't exist)
-    with open(filename, "w") as file:
+    with open(game_results_file, "w") as file:
         if game_results:
             file.write(f"{'ID':<5}{'Name':<10}{'Played':<8}{'Result':<8}{'Elo change'}\n")
             # Write each game result (ID, Player name, Result, Elo change)

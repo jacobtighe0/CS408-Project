@@ -45,8 +45,8 @@ def main():
                     win = True
                     elo = 25
                 update_player_wins(player.name, win, elo)
-                write_player_stats("player_stats.txt")
-                write_game_results("game_results.txt")
+                write_player_stats()
+                write_game_results()
                 break
             input("Press Enter to continue.")        
             
