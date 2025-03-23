@@ -1,15 +1,18 @@
 import sqlite3
 
+database = "game_data.db"
 def initialise_db():
     # Connect to (or create) the database file
-    conn = sqlite3.connect("game_data.db")  # Saves locally in the game folder
+    conn = sqlite3.connect(database)  # Saves locally in the game folder
     cursor = conn.cursor()
+
+    # Enable foreign key support in SQLite
+    cursor.execute("PRAGMA foreign_keys = ON;")
 
     # Create a table for player statistics if it doesn't exist
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS player_stats (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT UNIQUE,
+            name TEXT PRIMARY KEY,
             wins INTEGER DEFAULT 0,
             losses INTEGER DEFAULT 0,
             checks INTEGER DEFAULT 0,
@@ -17,15 +20,45 @@ def initialise_db():
             raises INTEGER DEFAULT 0,
             folds INTEGER DEFAULT 0,
             all_ins INTEGER DEFAULT 0,
-            total_actions INTEGER DEFAULT 0
+            total_actions INTEGER DEFAULT 0,
+            elo INTEGER DEFAULT 0,
+            initial_difficulty TEXT
+        )
+    ''')
+
+    # Create a table for game results if it doesn't exist
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS game_results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            player_name TEXT,
+            games_played INTEGER DEFAULT 0,
+            result TEXT CHECK(result IN ('win', 'loss')),
+            elo_change INTEGER,
+            FOREIGN KEY (player_name) REFERENCES player_stats(name)
         )
     ''')
 
     conn.commit()  # Save changes
     conn.close()   # Close connection
 
-def update_player_wins(name, win):
-    conn = sqlite3.connect("game_data.db")
+def add_initial_difficulty(name, difficulty, elo):
+    conn = sqlite3.connect(database)
+    cursor = conn.cursor()
+
+    # Check if the player exists
+    cursor.execute("SELECT * FROM player_stats WHERE name = ?", (name,))
+    player = cursor.fetchone()
+        
+    if player:
+        cursor.execute("UPDATE player_stats SET initial_difficulty = ?, elo = ? WHERE name = ?", (difficulty, elo, name))
+    else:
+        cursor.execute("INSERT INTO player_stats (name, initial_difficulty, elo) VALUES (?, ?, ?)", (name, difficulty, elo))
+
+    conn.commit()
+    conn.close()
+
+def update_player_wins(name, win, elo_change):
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # Check if the player exists
@@ -35,9 +68,15 @@ def update_player_wins(name, win):
     if player:
         # Update existing player's stats
         if win:
-            cursor.execute("UPDATE player_stats SET wins = wins + 1 WHERE name = ?", (name,))
+            cursor.execute("UPDATE player_stats SET wins = wins + 1, elo = elo + ? WHERE name = ?", (elo_change, name))
         else:
-            cursor.execute("UPDATE player_stats SET losses = losses + 1 WHERE name = ?", (name,))
+            cursor.execute("UPDATE player_stats SET losses = losses + 1, elo = elo + ? WHERE name = ?", (elo_change, name,))
+
+        # Insert into game_results
+        cursor.execute("INSERT INTO game_results (player_name, games_played, result, elo_change) VALUES (?, ?, ?, ?)",
+            (name, (player[1]+player[2])+1, 'win' if win else 'loss', elo_change))
+        # Update games_played by 1 and add the result to the game_results table
+        #cursor.execute("UPDATE game_results SET games_played = games_played + 1 WHERE player_name = ?", (name,))
     else:
         # Create new player record
         cursor.execute("INSERT INTO player_stats (name, wins, losses) VALUES (?, ?, ?)",
@@ -47,7 +86,7 @@ def update_player_wins(name, win):
     conn.close()
 
 def update_player_action(name, action):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     # Check if the player exists
@@ -77,13 +116,62 @@ def update_player_action(name, action):
     conn.close()
 
 def get_player_stats(name):
-    conn = sqlite3.connect("game_data.db")
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM player_stats WHERE name = ?", (name,))
     player = cursor.fetchone()
     
     conn.close()
-    return player  # Returns (id, name, wins, losses, action) or None
+    return player
 
+def get_game_results(name):
+    conn = sqlite3.connect(database)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM game_results WHERE player_name = ?", (name,))
+    player = cursor.fetchall()
+    
+    conn.close()
+    return player
+
+def write_player_stats(filename):
+    conn = sqlite3.connect(database)
+    cursor = conn.cursor()
+
+    # Fetch all player statistics
+    cursor.execute("SELECT * FROM player_stats ORDER BY name")
+    player_stats = cursor.fetchall()
+
+    # Open a text file for writing (or create it if it doesn't exist)
+    with open(filename, "w") as file:
+        if player_stats:
+            file.write(f"{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Elo':<6}{'Initial difficulty'}\n")
+            # Write each player's statistics
+            for player in player_stats:
+                file.write(f"{player[0]:<10}{player[1]:<6}{player[2]:<8}{player[3]:<8}{player[4]:<8}{player[5]:<8}{player[6]:<8}{player[7]:<10}{player[8]:<15}{player[9]:<6}{player[10]}\n")
+        else:
+            file.write("No player statistics found.\n")
+
+
+    conn.close()
+def write_game_results(filename):
+    conn = sqlite3.connect(database)
+    cursor = conn.cursor()
+
+    # Fetch all game results for the player
+    cursor.execute("SELECT * FROM game_results ORDER BY player_name")
+    game_results = cursor.fetchall()
+
+    # Open a text file for writing (or create it if it doesn't exist)
+    with open(filename, "w") as file:
+        if game_results:
+            file.write(f"{'ID':<5}{'Name':<10}{'Played':<8}{'Result':<8}{'Elo change'}\n")
+            # Write each game result (ID, Player name, Result, Elo change)
+            for result in game_results:
+                file.write(f"{result[0]:<5}{result[1]:<10}{result[2]:<8}{result[3]:<8}{result[4]}\n")
+        else:
+            file.write("No game results found.\n")
+
+    conn.close()
 

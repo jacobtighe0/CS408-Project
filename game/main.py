@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import poker
-from database import initialise_db, update_player_wins, get_player_stats
+from database import initialise_db, update_player_wins, write_game_results, write_player_stats
 from os import system
 def main():
     """ 
@@ -40,9 +40,13 @@ def main():
                 print("Money: ", int(game.dealer.playerControl.players[0].money))
                 print("")
                 win = False
+                elo = -15
                 if game.dealer.playerControl.players[0].name == player.name:
                     win = True
-                update_player_wins(player.name, win)
+                    elo = 25
+                update_player_wins(player.name, win, elo)
+                write_player_stats("player_stats.txt")
+                write_game_results("game_results.txt")
                 break
             input("Press Enter to continue.")        
             

@@ -7,7 +7,7 @@ Description: Game is the main Object implementing all the necessary tools for pl
 import ui
 import dealer
 from player import Player, SimpleAI
-from database import get_player_stats
+from database import add_initial_difficulty, get_player_stats, get_game_results
 
 class Game(object):
     """
@@ -25,13 +25,20 @@ class Game(object):
         if not player_stats: # If player is new, ask for difficulty and number of players
             print("New player detected!")
             difficulty = ui.diffQuest()
+            elo = 0
+            if difficulty == "easy":
+                elo = 350
+            elif difficulty == "normal":
+                elo = 500
+            elif difficulty == "hard":
+                elo = 650
+            add_initial_difficulty(name, difficulty, elo)
             numPlayers = ui.numQuest()
         else: # If player is not new, just ask for number of players, then print their stats
             numPlayers = ui.numQuest()
             print("")
-            print(player_stats)
-            print(f"Welcome back, {player_stats[1]}! Wins: {player_stats[2]}, Losses: {player_stats[3]}")
-            difficulty = "normal"
+            print(f"Welcome back, {player_stats[0]}!\nWins: {player_stats[1]}\t Losses: {player_stats[2]}\t Elo: {player_stats[9]}")
+            difficulty = get_player_stats(player_stats[10])
 
         money = 500
         return self.dealer.playerControl.createPlayers(name,numPlayers, money, difficulty)
