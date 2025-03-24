@@ -81,9 +81,16 @@ def newPlayerInfo():
     print("- Easy (0-99): AI makes predictable moves.")
     print("- Medium (100-199): AI adapts to its opponent.")
     print("- Hard (200+): AI starts bluffing.")
-    print("\nYou will start on easy.")
+    print("\nYour starting score is 0 (easy).")
     print("Increase your score by winning!")
-    input("\nPress Enter to play. ")     
+    print("\nEnter 'y' to start or 'n' to quit.")
+    while True:
+        x = input("> ")
+        if x.lower() == "y":
+            break
+        elif x.lower() == "n":
+            print("\nGoodbye!\n")
+            exit()
 
 def stats(name, wins, losses, elo, difficulty):
     """
