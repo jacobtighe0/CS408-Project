@@ -32,9 +32,9 @@ class SimpleAI(player.Player):
     def bet_size(self): # Calculates how much the AI should bet, returns a percent
         if self.hand_strength < 0.25:
             return 0.07 + (random() * 0.05)  # (7% to 12%) - Weak hand
-        elif self.hand_strength < 0.5:
+        elif self.hand_strength < 0.6:
             return 0.2 + ((self.hand_strength - 0.3) * 0.3)  # (20% to 26%) - Okay hand
-        elif self.hand_strength < 0.75:
+        elif self.hand_strength < 0.8:
             return 0.3 + ((self.hand_strength - 0.5) * 0.4)  # (30% to 38%) - Good hand
         else:
             return 0.4 + ((self.hand_strength - 0.75) * 0.6)  # (40% to 85%) - Strong hand
