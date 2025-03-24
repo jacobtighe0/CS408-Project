@@ -268,6 +268,9 @@ def findHandValue(cards):
         if option:
             #royalflush has lowest index so we invert values 
             #bigger number means better hand 
-            return (9 - index) + highCard(cards)
+            if isinstance(option[0], list):
+                return (9 - index) + highCard(cards) + highCard(option[0])
+            else:
+                return (9 - index) + highCard(cards) + highCard(option)
     return highCard(cards)
 
