@@ -144,23 +144,22 @@ def fourOfKind(histogram, cards):
 
 def straight(cards):
     """
-    Five cards in order
-    :returns: TODO
+    Detects if there is a straight (five consecutive cards).
+    :returns: List of five cards if a straight exists, otherwise False.
     """
+    cards = sorted(cards, key=lambda card: cardsOrder.index(card[0]), reverse=True)  # Sort cards by value
     pack = []
-    for card, next_card in zip(cards, cards[1:]):
-        if len(pack) == 4:
-            pack.append(card)
-            return pack
 
-        control = cardsOrder.index(card[0]) - cardsOrder.index(next_card[0])
+    for i in range(len(cards)):
+        if not pack or cardsOrder.index(cards[i][0]) == cardsOrder.index(pack[-1][0]) - 1:
+            pack.append(cards[i])  # Add to straight sequence
+        elif cardsOrder.index(cards[i][0]) != cardsOrder.index(pack[-1][0]):  
+            pack = [cards[i]]  # Reset pack if there's a break
 
-        if control == 1:
-            pack.append(card)
-        elif control == 0:
-            continue
-        else:
-            return False
+        if len(pack) == 5:
+            return pack  # Return the five-card straight
+
+    return False  # No straight found
 
 
 def sortCards(cards):
