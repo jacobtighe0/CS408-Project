@@ -29,7 +29,12 @@ class SimpleAI(player.Player):
         """
         return int((self.money - self.debt) * self.bet_size()) if self.money > self.debt else 0.0
     
-    def bet_size(self): # Calculates how much the AI should bet, returns a percent
+    def bet_size(self):
+        """
+        Calculates how much the AI should bet
+        
+        :returns: a percent
+        """
         if self.hand_strength < 0.25:
             return 0.07 + (random() * 0.05)  # (7% to 12%) - Weak hand
         elif self.hand_strength < 0.6:
@@ -53,20 +58,22 @@ class SimpleAI(player.Player):
         
     def calculate_ev(self):
         """
-        :returns: Expected values for calling and raising
+        Calculates the expected value (EV) for calling and raising.
+
+        :returns: Expected values for calling and raising.
         """
 
-        # Calculation to get the expected value of calling
-        call_cost = self.bet - self.deposit # aka debt
+        # EV calculation for calling
+        call_cost = self.bet - self.deposit
         ev_call = (self.hand_strength * (self.bet + self.deposit)) - ((1 - self.hand_strength) * call_cost)
 
-        # Calculation to get the expected value of raising
+        # EV calculation for raising
         raise_amount = self.raising()
         if raise_amount > 0:
             bet_after_raising = self.bet + raise_amount
             ev_raise = (self.hand_strength * bet_after_raising) - ((1 - self.hand_strength) * raise_amount)
-        else: # If raise_amount <= 0, then raising is not an option
-            ev_raise = float('-inf')
+        else:
+            ev_raise = float('-inf') # Raising is not an option
 
         return ev_call, ev_raise
     
@@ -119,7 +126,7 @@ class SimpleAI(player.Player):
         AI decides whether to bluff or not
         """
         if random() < self.bluff_chance:
-                self.hand_strength = self.hand_strength + ((1.0 - self.hand_strength) / 4)
+            self.hand_strength = self.hand_strength + ((1.0 - self.hand_strength) / 3)
 
     def options(self):
         options = { 0: self.quit,
@@ -138,7 +145,7 @@ class SimpleAI(player.Player):
                 player_elo = player_stats[10]
 
                 loops = 5000 # Number of simulations
-                mcts = MCTS(self)
+                mcts = MCTS(self) # Instance of MCTS class
                 i = 0
                 while i<loops:
                     mcts.run()
@@ -146,26 +153,24 @@ class SimpleAI(player.Player):
                 self.hand_strength = (mcts.root.wins/loops) # AI's chance of winning
                 self.bluff_chance = 0.2 # Resets bluff chance
 
-                # If player is at 'medium' level or higher, use player model
-                if player_elo >= 100:
+                if player_elo >= 100: # Medium difficulty
                     self.player_model()
-                # If player is at 'hard' level or higher, start bluffing
-                if player_elo >= 200:
+                if player_elo >= 200: # Hard difficulty
                     self.should_bluff()
 
                 ev_call, ev_raise = self.calculate_ev()
                 
             if ev_call > ev_raise and ev_call > 0:
-                action = 2
+                action = 2 # Call
             elif ev_raise > ev_call and ev_raise > 0:
-                action = 3
+                action = 3 # Raise
             else:
                 if self.checkBet():
-                    action = 1
+                    action = 1 # Check
                 else:
-                    action = 4
+                    action = 4 # Fold
                 
-            choosed = options[action]()
+            choosed = options[action]() # Chosen action
             self.prevAction = action
             if choosed:
                 return choosed
