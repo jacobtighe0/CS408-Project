@@ -18,7 +18,8 @@ def initialise_db():
     # Create a table for player statistics if it doesn't exist
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS player_stats (
-            name TEXT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE,
             wins INTEGER DEFAULT 0,
             losses INTEGER DEFAULT 0,
             checks INTEGER DEFAULT 0,
@@ -36,12 +37,12 @@ def initialise_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS game_results (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            player_name TEXT,
+            player_id TEXT,
             games_played INTEGER DEFAULT 0,
             result TEXT CHECK(result IN ('win', 'loss')),
             elo_change INTEGER,
             starting_elo INTEGER,
-            FOREIGN KEY (player_name) REFERENCES player_stats(name)
+            FOREIGN KEY (player_id) REFERENCES player_stats(id)
         )
     ''')
 
@@ -67,12 +68,12 @@ def update_player_wins(name, win, elo):
             elo_change = elo * 2 if win_streak > 1 else elo
             cursor.execute("UPDATE player_stats SET wins = wins + 1, win_streak = win_streak + 1, elo = elo + ? WHERE name = ?", (elo_change, name))
         else:
-            elo_change = elo if player[9] > 0 else 0
+            elo_change = elo if player[10] > 0 else 0
             cursor.execute("UPDATE player_stats SET losses = losses + 1, win_streak = 0, elo = elo + ? WHERE name = ?", (elo_change, name,))
 
         # Insert into game_results
-        cursor.execute("INSERT INTO game_results (player_name, games_played, result, elo_change, starting_elo) VALUES (?, ?, ?, ?, ?)",
-            (name, (player[1]+player[2])+1, 'win' if win else 'loss', elo_change, player[9]))
+        cursor.execute("INSERT INTO game_results (player_id, games_played, result, elo_change, starting_elo) VALUES (?, ?, ?, ?, ?)",
+            (player[0], (player[2]+player[3])+1, 'win' if win else 'loss', elo_change, player[10]))
     else:
         # Create new player record
         cursor.execute("INSERT INTO player_stats (name, wins, losses) VALUES (?, ?, ?)",
@@ -121,11 +122,11 @@ def get_player_stats(name):
     conn.close()
     return player
 
-def get_game_results(name):
+def get_game_results(id):
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM game_results WHERE player_name = ?", (name,))
+    cursor.execute("SELECT * FROM game_results WHERE player_id = ?", (id,))
     player = cursor.fetchall()
     
     conn.close()
@@ -142,10 +143,10 @@ def write_player_stats():
     # Open a text file for writing (or create it if it doesn't exist)
     with open(player_stats_file, "w") as file:
         if player_stats:
-            file.write(f"{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Score':<6}{'Win Streak'}\n")
+            file.write(f"{'ID':<4}{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Score':<6}{'Win Streak'}\n")
             # Write each player's statistics
             for player in player_stats:
-                file.write(f"{player[0]:<10}{player[1]:<6}{player[2]:<8}{player[3]:<8}{player[4]:<8}{player[5]:<8}{player[6]:<8}{player[7]:<10}{player[8]:<15}{player[9]:<6}{player[10]}\n")
+                file.write(f"{player[0]:<4}{player[1]:<10}{player[2]:<6}{player[3]:<8}{player[4]:<8}{player[5]:<8}{player[6]:<8}{player[7]:<8}{player[8]:<10}{player[9]:<15}{player[10]:<6}{player[11]}\n")
         else:
             file.write("No player statistics found.\n")
 
@@ -156,16 +157,16 @@ def write_game_results():
     cursor = conn.cursor()
 
     # Fetch all game results for the player
-    cursor.execute("SELECT * FROM game_results ORDER BY player_name")
+    cursor.execute("SELECT * FROM game_results ORDER BY player_id")
     game_results = cursor.fetchall()
 
     # Open a text file for writing (or create it if it doesn't exist)
     with open(game_results_file, "w") as file:
         if game_results:
-            file.write(f"{'ID':<5}{'Name':<10}{'Played':<8}{'Score':<7}{'Result':<8}{'Elo Gain':<10}{'New Score'}\n")
+            file.write(f"{'GameID':<9}{'PlayerID':<10}{'Games Played':<14}{'Result':<8}{'Elo Gain':<10}{'Old Score':<11}{'New Score'}\n")
             # Write each game result (ID, Player name, Result, Elo change)
             for result in game_results:
-                file.write(f"{result[0]:<5}{result[1]:<10}{result[2]:<8}{result[5]:<7}{result[3]:<8}{result[4]:<10}{result[5]+result[4]}\n")
+                file.write(f"{result[0]:<9}{result[1]:<10}{result[2]:<14}{result[3]:<8}{result[4]:<10}{result[5]:<11}{result[5]+result[4]}\n")
         else:
             file.write("No game results found.\n")
 

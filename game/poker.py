@@ -7,7 +7,7 @@ Description: Game is the main Object implementing all the necessary tools for pl
 import ui
 import dealer
 from player import Player, SimpleAI
-from database import get_player_stats, get_game_results
+from database import get_player_stats
 from os import system
 class Game(object):
     """
@@ -30,9 +30,9 @@ class Game(object):
             losses = 0
             elo = 0
         else: # If player is not new, just ask for number of players, then print their stats
-            wins = player_stats[1]
-            losses = player_stats[2]
-            elo = player_stats[9]
+            wins = player_stats[2]
+            losses = player_stats[3]
+            elo = player_stats[10]
 
         if elo < 100:
             difficulty = "easy"
