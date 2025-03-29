@@ -105,6 +105,3 @@ venv.bak/
 
 # swap backup file
 .py.swp
-game_data.db
-game_results.txt
-player_stats.txt
