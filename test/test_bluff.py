@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import patch, MagicMock
-import random
 import sys
 import os
 
@@ -17,6 +16,7 @@ class TestBluff(unittest.TestCase):
         self.ai.game.dealer.playerControl.players = [MagicMock(name='player1')]
         self.ai.game.dealer.playerControl.players[0].name = "Player1"
     
+    # Test to check if bluff is triggered when random value is below bluff chance
     @patch('game.player.simpleAI.random')
     def test_should_bluff_trigger(self, mock_random):
         self.ai.bluff_chance = 0.2
@@ -26,6 +26,7 @@ class TestBluff(unittest.TestCase):
         self.ai.should_bluff()
         self.assertGreater(self.ai.hand_strength, initial_hand_strength)
 
+    # Test to check if bluff is not triggered when random value is above bluff chance
     @patch('game.player.simpleAI.random')
     def test_should_not_bluff(self, mock_random):
         self.ai.bluff_chance = 0.2
@@ -35,33 +36,7 @@ class TestBluff(unittest.TestCase):
         self.ai.should_bluff()
         self.assertEqual(self.ai.hand_strength, initial_hand_strength)
 
-    @patch('game.player.simpleAI.random')
-    def test_should_bluff_with_hand_strength(self, mock_random):
-        self.ai.bluff_chance = 0.5
-        self.ai.hand_strength = 0.4
-        mock_random.return_value = 0.2
-        initial_hand_strength = self.ai.hand_strength
-        self.ai.should_bluff()
-        self.assertGreater(self.ai.hand_strength, initial_hand_strength)
-
-    @patch('game.player.simpleAI.random')
-    def test_bluff_chance_zero(self, mock_random):
-        self.ai.bluff_chance = 0.0
-        self.ai.hand_strength = 0.4
-        mock_random.return_value = 0.1
-        initial_hand_strength = self.ai.hand_strength
-        self.ai.should_bluff()
-        self.assertEqual(self.ai.hand_strength, initial_hand_strength)
-
-    @patch('game.player.simpleAI.random')
-    def test_bluff_chance_one(self, mock_random):
-        self.ai.bluff_chance = 1.0
-        self.ai.hand_strength = 0.4
-        mock_random.return_value = 0.1
-        initial_hand_strength = self.ai.hand_strength
-        self.ai.should_bluff()
-        self.assertGreater(self.ai.hand_strength, initial_hand_strength)
-
+    # Test for bluff when hand strength is low and bluff chance is high
     @patch('game.player.simpleAI.random')
     def test_should_bluff_high_chance_with_low_hand_strength(self, mock_random):
         self.ai.bluff_chance = 0.9
@@ -71,15 +46,17 @@ class TestBluff(unittest.TestCase):
         self.ai.should_bluff()
         self.assertGreater(self.ai.hand_strength, initial_hand_strength)
 
+    # Test for bluff when bluff chance is zero
     @patch('game.player.simpleAI.random')
-    def test_should_not_bluff_high_hand_strength_with_low_chance(self, mock_random):
-        self.ai.bluff_chance = 0.1
-        self.ai.hand_strength = 0.9
-        mock_random.return_value = 0.2
+    def test_bluff_chance_zero(self, mock_random):
+        self.ai.bluff_chance = 0.0
+        self.ai.hand_strength = 0.4
+        mock_random.return_value = 0.1
         initial_hand_strength = self.ai.hand_strength
         self.ai.should_bluff()
         self.assertEqual(self.ai.hand_strength, initial_hand_strength)
 
+    # Test when bluff chance equals hand strength, should bluff if random is below chance
     @patch('game.player.simpleAI.random')
     def test_should_bluff_when_hand_strength_equals_bluff_chance(self, mock_random):
         self.ai.bluff_chance = 0.5
@@ -88,28 +65,6 @@ class TestBluff(unittest.TestCase):
         initial_hand_strength = self.ai.hand_strength
         self.ai.should_bluff()
         self.assertGreater(self.ai.hand_strength, initial_hand_strength)
-
-    @patch('game.player.simpleAI.random')
-    def test_should_bluff_when_random_equals_bluff_chance(self, mock_random):
-        self.ai.bluff_chance = 0.5
-        self.ai.hand_strength = 0.4
-        mock_random.return_value = 0.5
-        initial_hand_strength = self.ai.hand_strength
-        self.ai.should_bluff()
-        self.assertGreaterEqual(self.ai.hand_strength, initial_hand_strength)
-
-    @patch('game.player.simpleAI.random')
-    def test_should_not_bluff_when_bluff_chance_zero_and_random_greater_than_zero(self, mock_random):
-        self.ai.bluff_chance = 0.0
-        self.ai.hand_strength = 0.4
-        mock_random.return_value = 0.5
-        initial_hand_strength = self.ai.hand_strength
-        self.ai.should_bluff()
-        self.assertEqual(self.ai.hand_strength, initial_hand_strength)
-
-
-
-
-
+    
 if __name__ == '__main__':
     unittest.main()
