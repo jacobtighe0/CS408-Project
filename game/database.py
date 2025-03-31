@@ -132,17 +132,16 @@ def get_game_results(id):
     conn.close()
     return player
 
+# Write player statistics to a text file
 def write_player_stats():
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
-
-    # Fetch all player statistics
     cursor.execute("SELECT * FROM player_stats ORDER BY name")
     player_stats = cursor.fetchall()
 
-    # Open a text file for writing (or create it if it doesn't exist)
     with open(player_stats_file, "w") as file:
         if player_stats:
+            # Write header
             file.write(f"{'ID':<4}{'Name':<10}{'Wins':<6}{'Losses':<8}{'Checks':<8}{'Calls':<8}{'Raises':<8}{'Folds':<8}{'All-ins':<10}{'Total actions':<15}{'Score':<6}{'Win Streak'}\n")
             # Write each player's statistics
             for player in player_stats:
@@ -152,19 +151,18 @@ def write_player_stats():
 
     conn.close()
     
+# Write game results to a text file
 def write_game_results():
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
-
-    # Fetch all game results for the player
     cursor.execute("SELECT * FROM game_results ORDER BY player_id")
     game_results = cursor.fetchall()
 
-    # Open a text file for writing (or create it if it doesn't exist)
     with open(game_results_file, "w") as file:
         if game_results:
+            # Write header
             file.write(f"{'GameID':<9}{'PlayerID':<10}{'Games Played':<14}{'Result':<8}{'Elo Gain':<10}{'Old Score':<11}{'New Score'}\n")
-            # Write each game result (ID, Player name, Result, Elo change)
+            # Write each game result
             for result in game_results:
                 file.write(f"{result[0]:<9}{result[1]:<10}{result[2]:<14}{result[3]:<8}{result[4]:<10}{result[5]:<11}{result[5]+result[4]}\n")
         else:

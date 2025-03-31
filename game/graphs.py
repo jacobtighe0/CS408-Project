@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import sqlite3
 import pandas as pd
 
-
+# Figure 3 in the report
 def plot_elo_progression():
     conn = sqlite3.connect("game/game_data.db")
     cursor = conn.cursor()
@@ -35,7 +35,7 @@ def plot_elo_progression():
     plt.grid(True)
     plt.show()
 
-
+# Figure 4 in the report
 def plot_playstyles():
     conn = sqlite3.connect("game/game_data.db")
     cursor = conn.cursor()
@@ -47,7 +47,6 @@ def plot_playstyles():
     conn.close()
 
     df = pd.DataFrame(data, columns=["Player ID", "Wins", "Losses", "Folds", "All-ins", "Raises"])
-
     df["Games Played"] = df["Wins"] + df["Losses"]
 
     def categorize_playstyle(row):    
@@ -59,11 +58,9 @@ def plot_playstyles():
             return "Neutral"
 
     df["Playstyle"] = df.apply(categorize_playstyle, axis=1)
-
     df["Win %"] = (df["Wins"] / df["Games Played"]) * 100
 
     playstyle_stats = df.groupby("Playstyle").agg(average_win_pct=("Win %", "mean"), player_count=("Player ID", "count"))
-
     playstyle_labels = [f"{playstyle} ({count})" for playstyle, count in playstyle_stats["player_count"].items()]
 
     plt.figure(figsize=(6, 4))
@@ -77,6 +74,7 @@ def plot_playstyles():
     plt.grid(axis="y", linestyle="--")
     plt.show()
 
+# Figure 5 in the report
 def plot_winrate_progression():
     conn = sqlite3.connect("game/game_data.db")
     cursor = conn.cursor()
@@ -127,7 +125,7 @@ def plot_winrate_progression():
     plt.grid(True)
     plt.show()
 
-    
+# Figure 6 in the report
 def plot_win_rate_per_difficulty():
     conn = sqlite3.connect("game/game_data.db")
     cursor = conn.cursor()
@@ -148,14 +146,12 @@ def plot_win_rate_per_difficulty():
     df = pd.DataFrame(game_results_with_difficulty, columns=["Difficulty", "Result"])
 
     win_rates = df.groupby("Difficulty")["Result"].value_counts(normalize=True).unstack(fill_value=0)
-
     win_rates["win_rate"] = win_rates["win"] * 100
 
     difficulty_order = ["Easy", "Medium", "Hard"]
     win_rates = win_rates.loc[difficulty_order]
 
     difficulty_counts = df["Difficulty"].value_counts()
-
     difficulty_labels = [f"{difficulty} ({difficulty_counts[difficulty]})" for difficulty in difficulty_order]
 
     colors = {"Easy": "green", "Medium": "orange", "Hard": "red"}

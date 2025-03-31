@@ -8,6 +8,7 @@ from ai.mcts import MCTS
 
 class SimpleAI(player.Player):
 
+    # Initializes the SimpleAI with a name and initial money
     def __init__(self, name = "AI_", money = 500.0):
         self.name = name
         self.money = money
@@ -129,6 +130,7 @@ class SimpleAI(player.Player):
             self.hand_strength = self.hand_strength + ((1.0 - self.hand_strength) / 3)
 
     def options(self):
+        # All the options available to each player
         options = { 0: self.quit,
                     1: self.checkBet ,
                     2: self.callBet , 
@@ -136,7 +138,9 @@ class SimpleAI(player.Player):
                     4: self.foldBet , 
                     5: self.allin,
                     }
+        # Print statement to tell the human player that the AI is currently "thinking"
         print(f"Waiting on {self.name}...")
+
         while True:
             if self.game is not None:
 
@@ -148,7 +152,7 @@ class SimpleAI(player.Player):
                 mcts = MCTS(self) # Instance of MCTS class
                 i = 0
                 while i<loops:
-                    mcts.run()
+                    mcts.run() # Run MCTS simulation
                     i+=1
                 self.hand_strength = (mcts.root.wins/loops) # AI's chance of winning
                 self.bluff_chance = 0.2 # Resets bluff chance

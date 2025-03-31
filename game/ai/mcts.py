@@ -2,7 +2,7 @@ import copy
 import math
 
 class Node:
-
+    # Initializes the node with the game state and other parameters
     def __init__(self, state):
         self.parent = None
         self.children = []
@@ -13,17 +13,19 @@ class Node:
         self.terminal = False
 
 class MCTS:
-    
+    # Initializes the MCTS with the AI and its game state
     def __init__(self, AI):
         self.root = Node(copy.deepcopy(AI.game))
         self.AIName = AI.name
         self.game = AI.game
 
+    # Runs the MCTS algorithm
     def run(self):
-        self.randomizeCards() # Randomizes cards for non-AI player
+        self.randomizeCards()
         selected_node = self.selection(self.root, self.root)
         self.expand(selected_node)
     
+    # Selects the best node using UCT formula
     def selection(self, node, highest_value_node):
         if node.terminal == False:
             if node.children != []:
@@ -43,6 +45,7 @@ class MCTS:
                 highest_value_node = node
         return highest_value_node
 
+    # Expands a node by adding a new child node
     def expand(self, node):
         if node.terminal == False:
             new_node = Node(copy.deepcopy(node.state))
@@ -62,6 +65,7 @@ class MCTS:
 
             self.simulate(new_node)
 
+    # Simulates a game from the given node
     def simulate(self, node):
         node.state.dealer.cardControl.shuffle()
         while len(node.state.dealer.cardControl.tableCards) < 5:
@@ -75,12 +79,14 @@ class MCTS:
         else:
             self.backpropagate(node, 0)
 
+    # Updates node values back up the tree
     def backpropagate(self, node, result):
         node.visits += 1
         node.wins += result
         if node.parent is not None:
             self.backpropagate(node.parent, result)
         
+    # Randomizes cards for non-AI player
     def randomizeCards(self):
         for player in self.root.state.dealer.playerControl.players:
             if player.name != self.AIName:
